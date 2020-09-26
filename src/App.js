@@ -23,20 +23,13 @@ const editor = new EditorJS({
 
 let timeStamp = String(Date.now());
 
-function noteSpeichern() {
-  editor.save().then((outputData) => {
-    console.log("Article data: ", outputData);
-
-    firebase.firestore().collection("notes").doc(timeStamp).set(outputData);
-  });
-}
-
 //! Ende Editor
 
 function App() {
   const [notes, setNotes] = useState(["abc"]);
   const [notesIDandName, setNotesIDandName] = useState(["abc"]);
   const [counter, setCounter] = useState(1);
+  const [noteName, setNoteName] = useState(null);
 
   let tempNotes = [];
   let tempNotesIDandName = [];
@@ -62,8 +55,24 @@ function App() {
     console.log(notes[0]);
   }
 
+  //// Neue Note Speichern
+
+  function noteSpeichern() {
+    editor.save().then((outputData) => {
+      console.log("Article data: ", outputData);
+      if (noteName == null) {
+        firebase.firestore().collection("notes").doc(timeStamp).set(outputData);
+      } else {
+        firebase.firestore().collection("notes").doc(noteName).set(outputData);
+      }
+    });
+  }
+
+  //// Klick auf Note in Sidebar
+
   function clicklog(event) {
     console.log(event.target.id, "LI geklickt");
+    setNoteName(event.target.id);
     firebase
       .firestore()
       .collection("notes")
@@ -71,22 +80,37 @@ function App() {
       .get()
       .then((antwort) => {
         console.log(antwort.data());
-
-        const editor2 = new EditorJS({
-          /**
-           * Id of Element that should contain Editor instance
-           */
-          holder: "editorjs",
-          tools: {
-            header: {
-              class: Header,
-              shortcut: "CMD+SHIFT+H",
-            },
-          },
-          data: antwort.data(),
-        });
+        editor.render(antwort.data());
       });
   }
+
+  //// Test
+
+  function idaendern() {
+    // document.getElementById("editorjs").remove();
+    // editor.destroy();
+    editor.render({
+      blocks: [
+        {
+          type: "paragraph",
+          data: {
+            text: "He was geht ab",
+          },
+        },
+        {
+          type: "header",
+          data: {
+            text: "New header",
+            level: 2,
+          },
+        },
+      ],
+      version: "2.18.0",
+      time: 111601102146575,
+    });
+  }
+
+  //// Ende Test
 
   return (
     <div>
@@ -120,7 +144,9 @@ function App() {
           </ul> */}
         </div>
         <div>
-          <div id="editorjs"></div>
+          <div id="editordiv">
+            <div id="editorjs"></div>
+          </div>
           <button
             onClick={() => {
               noteSpeichern();
@@ -128,6 +154,16 @@ function App() {
           >
             Speichern
           </button>
+          <div>
+            <button
+              onClick={() => {
+                idaendern();
+              }}
+            >
+              id aendern
+            </button>
+            <button id="test1">Test1</button>
+          </div>
         </div>
       </div>
     </div>
