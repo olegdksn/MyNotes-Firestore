@@ -3,7 +3,7 @@ import EditorJS from "@editorjs/editorjs";
 import Header from "@editorjs/header";
 
 import "./App.css";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
 const firebase = require("firebase");
 
@@ -30,6 +30,7 @@ function App() {
   const [notesIDandName, setNotesIDandName] = useState(["abc"]);
   const [counter, setCounter] = useState(1);
   const [noteName, setNoteName] = useState(null);
+  const [istVersteckt, setIstVersteckt] = useState(true);
 
   let tempNotes = [];
   let tempNotesIDandName = [];
@@ -89,14 +90,16 @@ function App() {
       <div className="wrapperDiv">
         <motion.div
           className="cssSidebarDiv"
-          onHoverStart={() => counterButton()}
+          onHoverStart={() => {
+            counterButton();
+            setIstVersteckt(true);
+          }}
+          onHoverEnd={() => {
+            setIstVersteckt(false);
+          }}
         >
-          <div>
-            {/* <motion.button onHoverStart={() => counterButton()}>
-              TESTBUTTON
-            </motion.button> */}
-          </div>
-          <div>
+          <div></div>
+          {/* <div>
             <button
               onClick={() => {
                 counterButton();
@@ -104,22 +107,31 @@ function App() {
             >
               {counter}
             </button>
-          </div>
-          <div>
-            <ul className="cssSidebarListe">
-              {notesIDandName.map((item) => (
-                <li
-                  key={item[0]}
-                  id={item[0]}
-                  className="cssSidebarNotes"
-                  onClick={(event) => {
-                    clicklog(event);
-                  }}
+          </div> */}
+          <div id="listeMitNotes">
+            <AnimatePresence>
+              {istVersteckt && (
+                <motion.ul
+                  className="cssSidebarListe"
+                  initial={{ x: -1000 }}
+                  animate={{ x: 0 }}
+                  exit={{ x: -1000 }}
                 >
-                  {item[1]}
-                </li>
-              ))}
-            </ul>
+                  {notesIDandName.map((item) => (
+                    <li
+                      key={item[0]}
+                      id={item[0]}
+                      className="cssSidebarNotes"
+                      onClick={(event) => {
+                        clicklog(event);
+                      }}
+                    >
+                      {item[1]}
+                    </li>
+                  ))}
+                </motion.ul>
+              )}
+            </AnimatePresence>
           </div>
           {/* <ul>
             {notes.map((item) => (
