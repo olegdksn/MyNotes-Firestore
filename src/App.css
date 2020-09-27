@@ -6,6 +6,7 @@ body {
   margin: 0;
   padding: 0;
   overflow: hidden;
+  background-color: #f2f3f7;
 }
 #evernote-container {
   height: 100%;
@@ -41,6 +42,85 @@ body {
 
 .wrapperDiv {
   display: grid;
-  grid-template-columns: 1fr 3fr;
+  grid-template-columns: 1fr 4fr;
   grid-column-gap: 1px;
+}
+
+.cssSidebarDiv {
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: 100vh;
+  padding-right: 20px;
+}
+
+.cssSidebarListe {
+  list-style: none;
+}
+
+.cssSidebarNotes {
+  color: rgb(92, 92, 92);
+  font-size: 18px;
+  margin-bottom: 6px;
+  padding: 5px 10px 10px 5px;
+
+  font-family: "Lato", sans-serif;
+  font-weight: 500;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  border: none;
+  box-shadow: -7px -7px 20px 0px #fff9, -4px -4px 5px 0px #fff9,
+    7px 7px 20px 0px #0002, 4px 4px 5px 0px #0001;
+}
+
+.cssSidebarNotes:hover {
+  background-color: rgb(207, 224, 243);
+}
+
+.cssRechteSeite {
+  justify-content: space-between;
+  flex-direction: column;
+  height: 100vh;
+  display: flex;
+}
+
+.editordiv {
+  padding-top: 80px;
+}
+
+#speichernButtonID {
+  justify-content: center;
+  display: flex;
+}
+
+.cssButtonSpeichern {
+  color: rgb(182, 182, 182);
+  font-size: 16px;
+  display: block;
+  width: 95%;
+  margin: 20px;
+
+  outline: none;
+  padding: 10px 25px;
+  font-family: "Lato", sans-serif;
+  font-weight: 500;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  display: inline-block;
+  border: none;
+  box-shadow: -7px -7px 20px 0px #fff9, -4px -4px 5px 0px #fff9,
+    7px 7px 20px 0px #0002, 4px 4px 5px 0px #0001;
+}
+
+.cssButtonSpeichern:hover {
+  color: rgb(7, 106, 199);
+  box-shadow: -7px -7px 20px 0px #fff9, -4px -4px 5px 0px #fff9,
+    7px 7px 20px 0px rgba(38, 112, 146, 0.133),
+    4px 4px 5px 0px rgba(46, 73, 109, 0.067);
+}
+
+.testcolor {
 }

@@ -3,7 +3,7 @@ import EditorJS from "@editorjs/editorjs";
 import Header from "@editorjs/header";
 
 import "./App.css";
-// import { motion } from "framer-motion";
+import { motion } from "framer-motion";
 
 const firebase = require("firebase");
 
@@ -33,6 +33,7 @@ function App() {
 
   let tempNotes = [];
   let tempNotesIDandName = [];
+
   useEffect(() => {
     firebase
       .firestore()
@@ -52,7 +53,6 @@ function App() {
 
   function counterButton() {
     setCounter(20);
-    console.log(notes[0]);
   }
 
   //// Neue Note Speichern
@@ -84,77 +84,65 @@ function App() {
       });
   }
 
-  //// Test
-
-  function idaendern() {
-    // document.getElementById("editorjs").remove();
-    // editor.destroy();
-    editor.render({
-      blocks: [
-        {
-          type: "paragraph",
-          data: {
-            text: "He was geht ab",
-          },
-        },
-        {
-          type: "header",
-          data: {
-            text: "New header",
-            level: 2,
-          },
-        },
-      ],
-      version: "2.18.0",
-      time: 111601102146575,
-    });
-  }
-
-  //// Ende Test
-
   return (
     <div>
       <div className="wrapperDiv">
-        <div>
-          <p>SideBar</p>
-          <button
-            onClick={() => {
-              counterButton();
-            }}
-          >
-            {counter}
-          </button>
-          <ul>
-            {notesIDandName.map((item) => (
-              <li
-                key={item[0]}
-                id={item[0]}
-                onClick={(event) => {
-                  clicklog(event);
-                }}
-              >
-                {item[1]}
-              </li>
-            ))}
-          </ul>
+        <motion.div
+          className="cssSidebarDiv"
+          onHoverStart={() => counterButton()}
+        >
+          <div>
+            {/* <motion.button onHoverStart={() => counterButton()}>
+              TESTBUTTON
+            </motion.button> */}
+          </div>
+          <div>
+            <button
+              onClick={() => {
+                counterButton();
+              }}
+            >
+              {counter}
+            </button>
+          </div>
+          <div>
+            <ul className="cssSidebarListe">
+              {notesIDandName.map((item) => (
+                <li
+                  key={item[0]}
+                  id={item[0]}
+                  className="cssSidebarNotes"
+                  onClick={(event) => {
+                    clicklog(event);
+                  }}
+                >
+                  {item[1]}
+                </li>
+              ))}
+            </ul>
+          </div>
           {/* <ul>
             {notes.map((item) => (
               <li key={item.inhalt}>{item.data}</li>
             ))}
           </ul> */}
-        </div>
-        <div>
+        </motion.div>
+        <div className="cssRechteSeite">
           <div id="editordiv">
             <div id="editorjs"></div>
           </div>
+
           <button
             onClick={() => {
               noteSpeichern();
             }}
+            className="cssButtonSpeichern"
+            id="speichernButtonID"
           >
             Speichern
           </button>
-          <div>
+
+          {/* <div>
             <button
               onClick={() => {
                 idaendern();
@@ -163,7 +151,7 @@ function App() {
               id aendern
             </button>
             <button id="test1">Test1</button>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>
