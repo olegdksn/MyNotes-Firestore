@@ -130,14 +130,6 @@ function App() {
       });
   }
 
-  //// Delete Knopf verstecken
-
-  function deleteButtonVerstecken(event) {
-    document
-      .getElementById(event.target.id + "button")
-      .classList.toggle("buttonVersteckt");
-  }
-
   //// Note löschen
   function deleteNote(event) {
     let zuLoeschendeNoteID = event.target.id - "button";
@@ -178,24 +170,8 @@ function App() {
                       onClick={(event) => {
                         clickSidebarNote(event);
                       }}
-                      onMouseEnter={(event) => {
-                        deleteButtonVerstecken(event);
-                      }}
-                      onMouseLeave={(event) => {
-                        deleteButtonVerstecken(event);
-                      }}
                     >
                       {item[1] ? item[1] : "keinname"}
-                      <motion.button
-                        id={item[0] + "button"}
-                        className="deleteButton buttonVersteckt"
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        exit={{ scale: 0 }}
-                        onClick={(event) => deleteNote(event)}
-                      >
-                        X
-                      </motion.button>
                     </li>
                   ))}
                 </motion.ul>

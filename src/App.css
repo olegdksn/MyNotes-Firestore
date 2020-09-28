@@ -68,6 +68,7 @@ body {
 
 .cssSidebarNotes {
   color: rgb(92, 92, 92);
+  width: 13vw;
   font-size: 14px;
   margin-bottom: 6px;
   padding: 10px 10px 10px 15px;
