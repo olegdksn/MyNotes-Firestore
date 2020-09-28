@@ -82,12 +82,18 @@ function App() {
             .collection("notes")
             .doc(timeStamp)
             .set({ ...outputData, ...{ nameDerNote: datumJetzt } });
+          let tempVorherigeNotes = notesIDandName;
+          tempVorherigeNotes.unshift([timeStamp, datumJetzt, outputData]);
+          setNotesIDandName(tempVorherigeNotes);
         } else {
           firebase
             .firestore()
             .collection("notes")
             .doc(timeStamp)
             .set({ ...outputData, ...{ nameDerNote: inputWert } });
+          let tempVorherigeNotes = notesIDandName;
+          tempVorherigeNotes.unshift([timeStamp, inputWert, outputData]);
+          setNotesIDandName(tempVorherigeNotes);
         }
       } else {
         // noteName ist die Document ID , d.h. wenn die Note bereits existiert, dann ist (noteName != null) und es gibt (inputWert != "")
@@ -130,6 +136,14 @@ function App() {
     document
       .getElementById(event.target.id + "button")
       .classList.toggle("buttonVersteckt");
+  }
+
+  //// Note löschen
+  function deleteNote(event) {
+    let zuLoeschendeNoteID = event.target.id - "button";
+    console.log(zuLoeschendeNoteID);
+    // firebase.firestore().collection("notes").doc(event.target.id - "button").delete().then(function() {
+    //   console.log("Document successfully deleted!");
   }
 
   //// RETURN Render
@@ -178,6 +192,7 @@ function App() {
                         initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
                         exit={{ scale: 0 }}
+                        onClick={(event) => deleteNote(event)}
                       >
                         X
                       </motion.button>
