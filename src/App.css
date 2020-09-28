@@ -92,17 +92,23 @@ body {
 .cssRechteSeite {
   justify-content: space-between;
   flex-direction: column;
-  height: 100vh;
+  height: 89vh;
   display: flex;
-}
-
-.editordiv {
-  padding-top: 80px;
+  padding-top: 60px;
 }
 
 #speichernButtonID {
   justify-content: center;
   display: flex;
+}
+
+#editordiv {
+  width: 60vw;
+  height: 80vh;
+  overflow-y: auto;
+}
+#editordiv::-webkit-scrollbar {
+  display: none;
 }
 
 .cssButtonSpeichern {
@@ -131,4 +137,36 @@ body {
   box-shadow: -7px -7px 20px 0px #fff9, -4px -4px 5px 0px #fff9,
     7px 7px 20px 0px rgba(38, 112, 146, 0.133),
     4px 4px 5px 0px rgba(46, 73, 109, 0.067);
+}
+
+.editButton {
+  float: right;
+}
+.deleteButton {
+  float: right;
+}
+
+#nameInput {
+  font-size: 16px;
+  outline: none;
+  border: solid;
+  border-width: 0px 0px 2px 0px;
+  border-color: rgba(201, 201, 201, 0.432);
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-right: 25px;
+
+  background-color: transparent;
+  color: rgb(109, 109, 109);
+  text-align: center;
+}
+
+#inputDIV {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#nameInput::-webkit-input-placeholder {
+  /* Chrome/Opera/Safari */
+  color: rgb(212, 212, 212);
 }

@@ -22,6 +22,8 @@ const editor = new EditorJS({
 });
 
 let timeStamp = String(Date.now());
+let timeNow = new Date();
+let datumJetzt = timeNow.toLocaleString("en-GB", { timeZone: "Asia/Brunei" });
 
 //! Ende Editor
 
@@ -31,6 +33,7 @@ function App() {
   const [counter, setCounter] = useState(1);
   const [noteName, setNoteName] = useState(null);
   const [istVersteckt, setIstVersteckt] = useState(true);
+  const [inputWert, setInputWert] = useState("Name");
 
   let tempNotes = [];
   let tempNotesIDandName = [];
@@ -43,7 +46,11 @@ function App() {
       .then((snapshot) => {
         snapshot.docs.forEach((doc) => {
           tempNotes.push(doc.data());
-          let tempidtext = [doc.id, doc.data().blocks[0].data.text];
+          let tempidtext = [
+            doc.id,
+            doc.data().nameDerNote, /// Das ist der Eintrag mit dem aktuellen Datum wenn kein Name eingegeben wurde.
+            doc.data().blocks[0].data.text,
+          ];
           tempNotesIDandName.push(tempidtext);
         });
       })
@@ -56,15 +63,38 @@ function App() {
     setCounter(20);
   }
 
+  //// Input Handler vom NamenFeld
+
+  function handleInputChange(event) {
+    setInputWert(event.target.value);
+  }
+
   //// Neue Note Speichern
 
   function noteSpeichern() {
     editor.save().then((outputData) => {
       console.log("Article data: ", outputData);
       if (noteName == null) {
-        firebase.firestore().collection("notes").doc(timeStamp).set(outputData);
+        if (inputWert == "Name" || inputWert == "") {
+          firebase
+            .firestore()
+            .collection("notes")
+            .doc(timeStamp)
+            .set({ ...outputData, ...{ nameDerNote: datumJetzt } });
+        } else {
+          firebase
+            .firestore()
+            .collection("notes")
+            .doc(timeStamp)
+            .set({ ...outputData, ...{ nameDerNote: inputWert } });
+        }
       } else {
-        firebase.firestore().collection("notes").doc(noteName).set(outputData);
+        // noteName ist die Document ID , d.h. wenn die Note bereits existiert, dann ist (noteName != null) und es gibt (inputWert != "")
+        firebase
+          .firestore()
+          .collection("notes")
+          .doc(noteName)
+          .set({ ...outputData, ...{ nameDerNote: inputWert } });
       }
     });
   }
@@ -82,6 +112,7 @@ function App() {
       .then((antwort) => {
         console.log(antwort.data());
         editor.render(antwort.data());
+        setInputWert(antwort.data().nameDerNote); // Name der Note wird in Inputfeld als Value eingetragen.
       });
   }
 
@@ -98,16 +129,6 @@ function App() {
             setIstVersteckt(false);
           }}
         >
-          <div></div>
-          {/* <div>
-            <button
-              onClick={() => {
-                counterButton();
-              }}
-            >
-              {counter}
-            </button>
-          </div> */}
           <div id="listeMitNotes">
             <AnimatePresence>
               {istVersteckt && (
@@ -126,7 +147,8 @@ function App() {
                         clicklog(event);
                       }}
                     >
-                      {item[1]}
+                      {item[1] ? item[1] : "keinname"}
+                      <button className="deleteButton">X</button>
                     </li>
                   ))}
                 </motion.ul>
@@ -143,7 +165,15 @@ function App() {
           <div id="editordiv">
             <div id="editorjs"></div>
           </div>
-
+          <div id="inputDIV">
+            <input
+              id="nameInput"
+              placeholder="Name"
+              maxLength="20"
+              value={inputWert}
+              onChange={handleInputChange}
+            ></input>
+          </div>
           <button
             onClick={() => {
               noteSpeichern();
@@ -153,17 +183,6 @@ function App() {
           >
             Speichern
           </button>
-
-          {/* <div>
-            <button
-              onClick={() => {
-                idaendern();
-              }}
-            >
-              id aendern
-            </button>
-            <button id="test1">Test1</button>
-          </div> */}
         </div>
       </div>
     </div>
