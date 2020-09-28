@@ -157,7 +157,7 @@ body {
   padding-right: 25px;
 
   background-color: transparent;
-  color: rgb(109, 109, 109);
+  color: rgb(160, 160, 160);
   text-align: center;
 }
 
@@ -169,4 +169,8 @@ body {
 #nameInput::-webkit-input-placeholder {
   /* Chrome/Opera/Safari */
   color: rgb(212, 212, 212);
+}
+
+.buttonVersteckt {
+  visibility: hidden;
 }

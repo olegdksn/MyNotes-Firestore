@@ -33,6 +33,7 @@ function App() {
   const [counter, setCounter] = useState(1);
   const [noteName, setNoteName] = useState(null);
   const [istVersteckt, setIstVersteckt] = useState(true);
+
   const [inputWert, setInputWert] = useState("Name");
 
   let tempNotes = [];
@@ -97,12 +98,19 @@ function App() {
           .set({ ...outputData, ...{ nameDerNote: inputWert } });
       }
     });
+
+    // Liste der Notes soll geupdated werden mit neuem Namen falls Input Name anders ist.
+    // d.h. die im State geladenen Notes werden durchsucht nach der geöffneten Note ID ( = noteName ) und der entsprechende Name wird durch inputWert ersetzt.
+    notesIDandName.forEach((item) => {
+      if (item[0] == noteName) {
+        item[1] = inputWert;
+      }
+    });
   }
 
   //// Klick auf Note in Sidebar
 
-  function clicklog(event) {
-    console.log(event.target.id, "LI geklickt");
+  function clickSidebarNote(event) {
     setNoteName(event.target.id);
     firebase
       .firestore()
@@ -115,6 +123,16 @@ function App() {
         setInputWert(antwort.data().nameDerNote); // Name der Note wird in Inputfeld als Value eingetragen.
       });
   }
+
+  //// Delete Knopf verstecken
+
+  function deleteButtonVerstecken(event) {
+    document
+      .getElementById(event.target.id + "button")
+      .classList.toggle("buttonVersteckt");
+  }
+
+  //// RETURN Render
 
   return (
     <div>
@@ -144,11 +162,25 @@ function App() {
                       id={item[0]}
                       className="cssSidebarNotes"
                       onClick={(event) => {
-                        clicklog(event);
+                        clickSidebarNote(event);
+                      }}
+                      onMouseEnter={(event) => {
+                        deleteButtonVerstecken(event);
+                      }}
+                      onMouseLeave={(event) => {
+                        deleteButtonVerstecken(event);
                       }}
                     >
                       {item[1] ? item[1] : "keinname"}
-                      <button className="deleteButton">X</button>
+                      <motion.button
+                        id={item[0] + "button"}
+                        className="deleteButton buttonVersteckt"
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        exit={{ scale: 0 }}
+                      >
+                        X
+                      </motion.button>
                     </li>
                   ))}
                 </motion.ul>
