@@ -175,3 +175,8 @@ body {
 .buttonVersteckt {
   visibility: hidden;
 }
+
+#trashFeld {
+  height: 20vh;
+  background-color: red;
+}

@@ -36,6 +36,9 @@ function App() {
 
   const [inputWert, setInputWert] = useState("Name");
 
+  const [trashVersteckt, setTrashVersteckt] = useState(false);
+  const [zuLoeschendeNoteID, setZuLoeschendeNoteID] = useState("");
+
   let tempNotes = [];
   let tempNotesIDandName = [];
 
@@ -130,13 +133,58 @@ function App() {
       });
   }
 
-  //// Note löschen
-  function deleteNote(event) {
-    let zuLoeschendeNoteID = event.target.id - "button";
-    console.log(zuLoeschendeNoteID);
-    // firebase.firestore().collection("notes").doc(event.target.id - "button").delete().then(function() {
-    //   console.log("Document successfully deleted!");
+  //// DRAG Operations //////////////////////////////////////////////////////////////////////////////////////////////
+
+  function startNoteDrag(event) {
+    setTrashVersteckt(true);
+    event.dataTransfer.setData("text/plain", event.target.id);
+
+    console.log(event.target.id, "note wird gedragged");
   }
+
+  const endNoteDrag = (event) => {
+    event.preventDefault();
+    console.log(event.dataTransfer.getData("application/my-app"));
+    setTrashVersteckt(false);
+  };
+
+  function noteDragOver(event) {
+    event.preventDefault();
+    const data = event.dataTransfer.getData("text/plain");
+    console.log(data);
+  }
+
+  function noteDropTrash(event) {
+    event.preventDefault();
+    const data = event.dataTransfer.getData("text/plain");
+    console.log(data, "wird geloescht");
+    firebase
+      .firestore()
+      .collection("notes")
+      .doc(data)
+      .delete()
+      .then(function () {
+        console.log("Document successfully deleted!");
+      })
+      .catch(function (error) {
+        console.error("Error removing document: ", error);
+      });
+
+    let tempnotesIDandName = [];
+    let gesuchtesItem;
+    notesIDandName.forEach((item) => {
+      if (item[0] == data) {
+        gesuchtesItem = item;
+      }
+    });
+    console.log(gesuchtesItem);
+    tempnotesIDandName = notesIDandName.filter(function (element) {
+      return element != gesuchtesItem;
+    });
+    setNotesIDandName(tempnotesIDandName);
+  }
+
+  //// Ende DRAG ///// //////////////////////////////////////////////////////////////////////////////////////////////
 
   //// RETURN Render
 
@@ -170,6 +218,9 @@ function App() {
                       onClick={(event) => {
                         clickSidebarNote(event);
                       }}
+                      draggable="true"
+                      onDragStart={(event) => startNoteDrag(event)}
+                      onDragEnd={(event) => endNoteDrag(event)}
                     >
                       {item[1] ? item[1] : "keinname"}
                     </li>
@@ -188,6 +239,15 @@ function App() {
           <div id="editordiv">
             <div id="editorjs"></div>
           </div>
+          {trashVersteckt && (
+            <div
+              id="trashFeld"
+              onDragOver={noteDragOver}
+              onDrop={noteDropTrash}
+            >
+              <p>Trash</p>
+            </div>
+          )}
           <div id="inputDIV">
             <input
               id="nameInput"
