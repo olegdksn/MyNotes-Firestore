@@ -37,7 +37,7 @@ function App() {
   const [inputWert, setInputWert] = useState("Name");
 
   const [trashVersteckt, setTrashVersteckt] = useState(false);
-  const [zuLoeschendeNoteID, setZuLoeschendeNoteID] = useState("");
+  const [notesListMitY, setNotesListMitY] = useState([]);
 
   let tempNotes = [];
   let tempNotesIDandName = [];
@@ -54,17 +54,45 @@ function App() {
             doc.id,
             doc.data().nameDerNote, /// Das ist der Eintrag mit dem aktuellen Datum wenn kein Name eingegeben wurde.
             doc.data().blocks[0].data.text,
+            doc.data().yWert,
           ];
           tempNotesIDandName.push(tempidtext);
         });
       })
-
+      .then(
+        tempNotesIDandName.sort(
+          (function (index) {
+            return function (a, b) {
+              return a[index] === b[index] ? 0 : a[index] < b[index] ? -1 : 1;
+            };
+          })(3)
+        )
+      )
       .then(setNotes(tempNotes)) ///...///...///.../// Problem:   Der State wird erst nach naechstem Render step geupdated. Deswegen hab ich den CounterButton als Test reingetan
       .then(setNotesIDandName(tempNotesIDandName));
   }, []);
 
+  //// Counter Button um State zum updaten zu zwingen
+
   function counterButton() {
     setCounter(20);
+  }
+
+  //// Y - Werte für alle Liste-Items zu speichern
+
+  // Y-Werte sollen von Firestore ausgelesen werden
+
+  function yWerteBerechnen() {
+    let tempNotesListForY = notesIDandName;
+    tempNotesListForY.forEach((item) => {
+      let yWertVomItem = document
+        .getElementById(item[0])
+        .getBoundingClientRect().y;
+
+      item[3] = yWertVomItem;
+    });
+
+    setNotesListMitY(notesIDandName);
   }
 
   //// Input Handler vom NamenFeld
@@ -84,7 +112,7 @@ function App() {
             .firestore()
             .collection("notes")
             .doc(timeStamp)
-            .set({ ...outputData, ...{ nameDerNote: datumJetzt } });
+            .set({ ...outputData, ...{ nameDerNote: datumJetzt, yWert: 0 } });
           let tempVorherigeNotes = notesIDandName;
           tempVorherigeNotes.unshift([timeStamp, datumJetzt, outputData]);
           setNotesIDandName(tempVorherigeNotes);
@@ -93,7 +121,7 @@ function App() {
             .firestore()
             .collection("notes")
             .doc(timeStamp)
-            .set({ ...outputData, ...{ nameDerNote: inputWert } });
+            .set({ ...outputData, ...{ nameDerNote: inputWert, yWert: 0 } });
           let tempVorherigeNotes = notesIDandName;
           tempVorherigeNotes.unshift([timeStamp, inputWert, outputData]);
           setNotesIDandName(tempVorherigeNotes);
@@ -104,7 +132,7 @@ function App() {
           .firestore()
           .collection("notes")
           .doc(noteName)
-          .set({ ...outputData, ...{ nameDerNote: inputWert } });
+          .set({ ...outputData, ...{ nameDerNote: inputWert, yWert: 0 } });
       }
     });
 
@@ -135,6 +163,22 @@ function App() {
 
   //// DRAG Operations //////////////////////////////////////////////////////////////////////////////////////////////
 
+  let draggableNoteY = [0, 0];
+
+  function whileDragging(event) {
+    console.log(
+      "Anfangswert ",
+      document.getElementById(event.target.id).getBoundingClientRect().y
+    );
+
+    if (event.clientY !== 0) {
+      draggableNoteY[0] = event.target.id;
+      draggableNoteY[1] = event.clientY;
+    }
+
+    // console.log("aktueller Wert ", event.clientY);
+  }
+
   function startNoteDrag(event) {
     setTrashVersteckt(true);
     event.dataTransfer.setData("text/plain", event.target.id);
@@ -146,6 +190,41 @@ function App() {
     event.preventDefault();
     console.log(event.dataTransfer.getData("application/my-app"));
     setTrashVersteckt(false);
+    console.log(
+      "letzter Punkt Y ",
+      draggableNoteY[1],
+      "von ID: ",
+      draggableNoteY[0]
+    );
+
+    notesListMitY.forEach((item) => {
+      if (item[0] === draggableNoteY[0]) {
+        item[3] = draggableNoteY[1];
+      }
+    });
+    console.table(notesListMitY);
+
+    // Sortiere notesListMitY nach dem Y-Wert bei Index 3
+    let tempnotesListMitY = notesListMitY;
+    tempnotesListMitY.sort(
+      (function (index) {
+        return function (a, b) {
+          return a[index] === b[index] ? 0 : a[index] < b[index] ? -1 : 1;
+        };
+      })(3)
+    );
+    setNotesIDandName(tempnotesListMitY);
+
+    // Speichere alle Y-Werte in Firestore ab:
+
+    notesIDandName.forEach((item) => {
+      firebase.firestore().collection("notes").doc(item[0]).set(
+        {
+          yWert: item[3],
+        },
+        { merge: true }
+      );
+    });
   };
 
   function noteDragOver(event) {
@@ -196,6 +275,7 @@ function App() {
           onHoverStart={() => {
             counterButton();
             setIstVersteckt(true);
+            yWerteBerechnen();
           }}
           onHoverEnd={() => {
             setIstVersteckt(false);
@@ -221,6 +301,9 @@ function App() {
                       draggable="true"
                       onDragStart={(event) => startNoteDrag(event)}
                       onDragEnd={(event) => endNoteDrag(event)}
+                      onDrag={(event) => {
+                        whileDragging(event);
+                      }}
                     >
                       {item[1] ? item[1] : "keinname"}
                     </li>
