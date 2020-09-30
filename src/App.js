@@ -33,6 +33,7 @@ function App() {
   const [counter, setCounter] = useState(1);
   const [noteName, setNoteName] = useState(null);
   const [istVersteckt, setIstVersteckt] = useState(true);
+  const [ordnerVersteckt, setOrdnerVersteckt] = useState({});
 
   const [inputWert, setInputWert] = useState("Name");
 
