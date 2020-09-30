@@ -46,6 +46,7 @@ function App() {
     firebase
       .firestore()
       .collection("notes")
+      .orderBy("yWert")
       .get()
       .then((snapshot) => {
         snapshot.docs.forEach((doc) => {
@@ -59,15 +60,7 @@ function App() {
           tempNotesIDandName.push(tempidtext);
         });
       })
-      .then(
-        tempNotesIDandName.sort(
-          (function (index) {
-            return function (a, b) {
-              return a[index] === b[index] ? 0 : a[index] < b[index] ? -1 : 1;
-            };
-          })(3)
-        )
-      )
+
       .then(setNotes(tempNotes)) ///...///...///.../// Problem:   Der State wird erst nach naechstem Render step geupdated. Deswegen hab ich den CounterButton als Test reingetan
       .then(setNotesIDandName(tempNotesIDandName));
   }, []);
