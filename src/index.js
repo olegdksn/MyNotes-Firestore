@@ -7,15 +7,39 @@ const firebase = require("firebase");
 require("firebase/firestore");
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBuRqhdjDoX_9bvz3E2fDcKLQaPK5yeqlA",
-  authDomain: "notesapp-77983.firebaseapp.com",
-  databaseURL: "https://notesapp-77983.firebaseio.com",
-  projectId: "notesapp-77983",
-  storageBucket: "notesapp-77983.appspot.com",
-  messagingSenderId: "864309588180",
-  appId: "1:864309588180:web:eab9c9bcc5c0bf010f4b41",
+  apiKey: "AIzaSyDuMpMzuZwnpwM2R2OzHn7OPluV1WIPyVc",
+  authDomain: "mynotes-831de.firebaseapp.com",
+  databaseURL: "https://mynotes-831de.firebaseio.com",
+  projectId: "mynotes-831de",
+  storageBucket: "mynotes-831de.appspot.com",
+  messagingSenderId: "746032959130",
+  appId: "1:746032959130:web:adb8473604fc9726cdd923",
 };
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
+
+// // Login Button
+// const btnLogin = document.getElementById("loginButton");
+
+// // Login Button Authentication onClick
+// btnLogin.addEventListener("click", (event) => {
+//   event.preventDefault();
+//   console.log("login Klick");
+//   firebase.auth().signInAnonymously();
+// });
+
+// firebase.auth().onAuthStateChanged(function (user) {
+//   if (user) {
+//     // User is signed in.
+//     var isAnonymous = user.isAnonymous;
+//     var uid = user.uid;
+//     btnLogin.classList.toggle("loginButtonVerstecken");
+//     console.log(uid);
+//   } else {
+//     // User is signed out.
+//     // ...
+//   }
+//   // ...
+// });
 
 ReactDOM.render(<App />, document.getElementById("root"));

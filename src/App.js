@@ -28,11 +28,15 @@ let datumJetzt = timeNow.toLocaleString("en-GB", { timeZone: "Asia/Brunei" });
 //! Ende Editor
 
 function App() {
+  const [loggedIn, setLoggedIn] = useState(false);
+
   const [notes, setNotes] = useState(["abc"]);
   const [notesIDandName, setNotesIDandName] = useState(["abc"]);
   const [counter, setCounter] = useState(1);
   const [noteName, setNoteName] = useState(null);
   const [istVersteckt, setIstVersteckt] = useState(true);
+  const [newButtonIstVersteckt, setNewButtonIstVersteckt] = useState(false);
+
   const [ordnerVersteckt, setOrdnerVersteckt] = useState({});
 
   const [inputWert, setInputWert] = useState("Name");
@@ -43,6 +47,8 @@ function App() {
   let tempNotes = [];
   let tempNotesIDandName = [];
 
+  //// Firebase on Authentication:  Lade Daten aus Firestore:
+
   useEffect(() => {
     firebase
       .firestore()
@@ -52,12 +58,15 @@ function App() {
       .then((snapshot) => {
         snapshot.docs.forEach((doc) => {
           tempNotes.push(doc.data());
+
           let tempidtext = [
             doc.id,
             doc.data().nameDerNote, /// Das ist der Eintrag mit dem aktuellen Datum wenn kein Name eingegeben wurde.
             doc.data().blocks[0].data.text,
             doc.data().yWert,
+            doc.data().ordnerName,
           ];
+
           tempNotesIDandName.push(tempidtext);
         });
       })
@@ -70,6 +79,12 @@ function App() {
 
   function counterButton() {
     setCounter(20);
+  }
+
+  //// Neue Note erstellen
+
+  function newNote() {
+    document.location.reload();
   }
 
   //// Y - Werte für alle Liste-Items zu speichern
@@ -100,33 +115,45 @@ function App() {
   function noteSpeichern() {
     editor.save().then((outputData) => {
       console.log("Article data: ", outputData);
-      if (noteName == null) {
-        if (inputWert == "Name" || inputWert == "") {
-          firebase
-            .firestore()
-            .collection("notes")
-            .doc(timeStamp)
-            .set({ ...outputData, ...{ nameDerNote: datumJetzt, yWert: 0 } });
-          let tempVorherigeNotes = notesIDandName;
-          tempVorherigeNotes.unshift([timeStamp, datumJetzt, outputData]);
-          setNotesIDandName(tempVorherigeNotes);
+
+      if (Object.keys(outputData.blocks).length !== 0) {
+        if (noteName == null) {
+          if (inputWert == "Name" || inputWert == "") {
+            firebase
+              .firestore()
+              .collection("notes")
+              .doc(timeStamp)
+              .set({ ...outputData, ...{ nameDerNote: datumJetzt, yWert: 0 } });
+            let tempVorherigeNotes = notesIDandName;
+            tempVorherigeNotes.unshift([timeStamp, datumJetzt, outputData]);
+            setNotesIDandName(tempVorherigeNotes);
+          } else {
+            firebase
+              .firestore()
+              .collection("notes")
+              .doc(timeStamp)
+              .set({ ...outputData, ...{ nameDerNote: inputWert, yWert: 0 } });
+            let tempVorherigeNotes = notesIDandName;
+            tempVorherigeNotes.unshift([timeStamp, inputWert, outputData]);
+            setNotesIDandName(tempVorherigeNotes);
+          }
         } else {
+          // noteName ist die Document ID , d.h. wenn die Note bereits existiert, dann ist (noteName != null) und es gibt (inputWert != "")
           firebase
             .firestore()
             .collection("notes")
-            .doc(timeStamp)
+            .doc(noteName)
             .set({ ...outputData, ...{ nameDerNote: inputWert, yWert: 0 } });
-          let tempVorherigeNotes = notesIDandName;
-          tempVorherigeNotes.unshift([timeStamp, inputWert, outputData]);
-          setNotesIDandName(tempVorherigeNotes);
         }
       } else {
-        // noteName ist die Document ID , d.h. wenn die Note bereits existiert, dann ist (noteName != null) und es gibt (inputWert != "")
-        firebase
-          .firestore()
-          .collection("notes")
-          .doc(noteName)
-          .set({ ...outputData, ...{ nameDerNote: inputWert, yWert: 0 } });
+        document
+          .getElementById("speichernButtonID")
+          .classList.toggle("cssButtonSpeichernEmptyNote");
+        setTimeout(() => {
+          document
+            .getElementById("speichernButtonID")
+            .classList.toggle("cssButtonSpeichernEmptyNote");
+        }, 800);
       }
     });
 
@@ -231,6 +258,7 @@ function App() {
     event.preventDefault();
     const data = event.dataTransfer.getData("text/plain");
     console.log(data, "wird geloescht");
+    setTrashVersteckt(false);
     firebase
       .firestore()
       .collection("notes")
@@ -259,6 +287,17 @@ function App() {
 
   //// Ende DRAG ///// //////////////////////////////////////////////////////////////////////////////////////////////
 
+  //// Funktion um alle Ordner Namen zu listen:
+
+  let ordnerNamenListe = new Set();
+  function ordnerListeMachen() {
+    notesIDandName.forEach((item) => {
+      ordnerNamenListe.add(item[4]);
+    });
+  }
+
+  ordnerListeMachen();
+
   //// RETURN Render
 
   return (
@@ -280,14 +319,22 @@ function App() {
               {istVersteckt && (
                 <motion.ul
                   className="cssSidebarListe"
-                  initial={{ x: -1000 }}
-                  animate={{ x: 0 }}
-                  exit={{ x: -1000 }}
+                  // initial={{ x: -1000 }}
+                  // animate={{ x: 0 }}
+                  // exit={{ x: -1000 }}
+                  initial={{ y: -300, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  exit={{ y: -300, opacity: 0 }}
                 >
                   {notesIDandName.map((item) => (
+                    // Check ob Note in einem Folder
+
                     <li
                       key={item[0]}
                       id={item[0]}
+                      // { (item[4] != 0 ) &&  }
+
+                      data-ordner={item[4]}
                       className="cssSidebarNotes"
                       onClick={(event) => {
                         clickSidebarNote(event);
@@ -344,6 +391,33 @@ function App() {
             Speichern
           </button>
         </div>
+        <motion.div
+          className="cssRechteSidebar"
+          onHoverStart={() => {
+            console.log(newButtonIstVersteckt);
+            setNewButtonIstVersteckt(true);
+            console.log(newButtonIstVersteckt);
+          }}
+          onHoverEnd={() => {
+            setNewButtonIstVersteckt(false);
+          }}
+        >
+          <AnimatePresence>
+            {newButtonIstVersteckt && (
+              <motion.button
+                className="newNoteButtonCSS"
+                initial={{ y: -300, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: -300, opacity: 0 }}
+                onClick={() => {
+                  newNote();
+                }}
+              >
+                New Note
+              </motion.button>
+            )}
+          </AnimatePresence>
+        </motion.div>
       </div>
     </div>
   );

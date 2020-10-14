@@ -42,7 +42,7 @@ body {
 
 .wrapperDiv {
   display: grid;
-  grid-template-columns: 1fr 4fr;
+  grid-template-columns: 1.5fr 5fr 0.5fr;
   grid-column-gap: 1px;
 }
 
@@ -52,6 +52,7 @@ body {
   overflow-x: hidden;
   max-height: 100vh;
   padding-right: 20px;
+  padding-top: 30px;
 }
 
 .cssSidebarDiv::-webkit-scrollbar {
@@ -133,11 +134,47 @@ body {
     7px 7px 20px 0px #0002, 4px 4px 5px 0px #0001;
 }
 
+.cssButtonSpeichernEmptyNote {
+  color: red !important;
+}
+
 .cssButtonSpeichern:hover {
   color: rgb(7, 106, 199);
   box-shadow: -7px -7px 20px 0px #fff9, -4px -4px 5px 0px #fff9,
     7px 7px 20px 0px rgba(38, 112, 146, 0.133),
     4px 4px 5px 0px rgba(46, 73, 109, 0.067);
+}
+
+#loginButton {
+  color: rgb(182, 182, 182);
+  font-size: 16px;
+  display: block;
+  width: 95%;
+  margin: 20px;
+
+  outline: none;
+  padding: 10px 25px;
+  font-family: "Lato", sans-serif;
+  font-weight: 500;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  display: inline-block;
+  border: none;
+  box-shadow: -7px -7px 20px 0px #fff9, -4px -4px 5px 0px #fff9,
+    7px 7px 20px 0px #0002, 4px 4px 5px 0px #0001;
+}
+
+#loginButton:hover {
+  color: rgb(7, 106, 199);
+  box-shadow: -7px -7px 20px 0px #fff9, -4px -4px 5px 0px #fff9,
+    7px 7px 20px 0px rgba(38, 112, 146, 0.133),
+    4px 4px 5px 0px rgba(46, 73, 109, 0.067);
+}
+
+.loginButtonVerstecken {
+  display: none;
 }
 
 .editButton {
@@ -179,4 +216,35 @@ body {
 #trashFeld {
   height: 20vh;
   background-color: red;
+}
+
+[data-ordner="0"] {
+  background-color: green;
+}
+[data-ordner="ZweiterOrdner"] {
+  background-color: yellow;
+}
+[data-ordner="Testordner"] {
+  background-color: rgb(212, 12, 136);
+}
+
+.newNoteButtonCSS {
+  color: rgb(92, 92, 92);
+
+  font-size: 22px;
+  padding: 10px 10px 10px 15px;
+  margin-top: 30px;
+  height: 80vh;
+  font-family: "Lato", sans-serif;
+  font-weight: 500;
+  background: transparent;
+  cursor: pointer;
+
+  border: none;
+  box-shadow: -7px -7px 20px 0px #fff9, -4px -4px 5px 0px #fff9,
+    7px 7px 20px 0px #0002, 4px 4px 5px 0px #0001;
+}
+
+.newNoteButtonCSS:hover {
+  color: rgba(43, 102, 179, 0.726);
 }
